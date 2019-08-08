@@ -1,0 +1,102 @@
+命令行签名包括了签名，应用管理，用户管理，时间锁管理4部分功能
+
+综述
+au命令行第一个参数指定功能，这个参数不能调整位置，必须第一个指定，-sign是签名,-user是修改用户信息功能,-app是修改app信息功能 ，然后跟功能命令需要的参数信息
+参数 如果是简单的可以不用双引号，如果是复杂的参数，例如有空格，带"-"，特殊字符，汉字等的需要用 双引号括起来，并且是英语输入状态下的双引号 ""
+除了第一个命令和第一个命令的值外，其他参数可以调整顺序。下面例子 -c 参数的位置不一样，但是他们都是有效的
+ausign -sign wechat.ipa -c my.p12 -m my.mobileprovision -p 123456 -o resign-wechat.ipa
+ausign -sign wechat.ipa  -m my.mobileprovision -p "kjkj7&8*" -c my.p12 -o resign-wechat.ipa
+
+一、签名功能
+普通签名例子     
+ausign -sign wechat.ipa -c my.p12 -m my.mobileprovision -p 123456 -o resign-wechat.ipa
+说明：签名都是以  -sign 参数开始 ，后面是被签名的ipa文件，-c 指定证书，-m  指定描述文件  ，-p 指定证书密码  -o 指定签名完后文件的存放地址
+
+自动删除锁签名例子
+ausign -sign wechat.ipa -c my.p12 -m my.mobileprovision -p 123456 -o resign-wechat.ipa -dt 
+和普通签名相比多了一个参数  -dt 表示  delete time lock，删除时间锁的意思
+
+自动插入时间锁例子
+ausign -sign wechat.ipa -c my.p12 -m my.mobileprovision -p 123456 -o resign-wechat.ipa -at 20190701
+和普通相比 多了 -at 20190701参数，表示 add time lock，就是添加时间锁的意思,-at 后面是签名到期的时间
+
+更新签名
+ausign -sign wechat.ipa -c my.p12 -m my.mobileprovision -p 123456 -o resign-wechat.ipa -replace 100876
+更新现有的应用 -replace 100876 参数，100876是应用的编号，可以通过 ausign -apps 查看所有app id值（编号，一个数字）
+
+修改应用id后签名
+ausign -sign wechat.ipa -c my.p12 -m my.mobileprovision -p 123456 -o resign-wechat.ipa -id com.tencent.wechat22222222
+把应用id 改成com.tencent.wechat22222222 后重新签名
+可以修改的信息还有 -n 指定修改名称 ，-v 指定修改版本号
+
+组合签名例子
+ausign -sign wechat.ipa -c my.p12 -m my.mobileprovision -p "123456" -o resign-wechat.ipa -id "com.tencent.wechat3" -n "微信马甲3" -v "1.0.0" -dt -at 20190902
+上面各种参数可以组合使用，下面是一个例子，自动删除时间锁，自动插入时间锁设置到期日期20190902，然后把id修改为自己的com.tencent.wechat3，把名字修改为微信马甲3,把版本号改成1.0.0
+
+二、应用管理
+查看先有的应用列表
+ausign -apps 
+说明：被删除了的应用将无法再查看，应用信息已json显示
+
+修改应用信息签名到期时间
+ausign -app 3aa99adf-72e7-441a-be5b-518c050a79b2 -k expire_time -v 20190801
+修改app信息的命令"app"比查看app命令"apps"少了个"s",命令后面紧跟着应用的id标记，指定是对哪个app进行修改，
+-k指定是对应用的哪个信息进行修改,-k 后面可以跟的修改内容包括：
+expire_time（到期时间，格式20190102）,is_bid(是否被禁用,1表示禁用,0不禁用),is_deleted(是否删除),alert_msg(app过期提醒信息),description(应用的备注),contact(应用的联系人信息)
+-v 是设置的新的值，这个值根据-k不同不一样，例如 is_bid,则传入0或者1有效，expire_time 则只有 格式类似20191201这种日期格式有效，而对于description,则可以设置任何信息都有效
+
+下面举例
+修改应用描述信息
+ausign -app 3aa99adf-72e7-441a-be5b-518c050a79b2 -k description -v "微信马甲最新版收150元"
+修改应用到期提醒信息
+ausign -app 3aa99adf-72e7-441a-be5b-518c050a79b2 -k alert_msg -v "签名已经到期，请联系qq2462611616"
+删除app
+ausign -app 3aa99adf-72e7-441a-be5b-518c050a79b2 -k is_deleted -v 1
+禁用app
+ausign -app 3aa99adf-72e7-441a-be5b-518c050a79b2 -k is_bid -v 1
+给app设置个联系人信息
+ausign -app 3aa99adf-72e7-441a-be5b-518c050a79b2 -k contact -v "张三qq2462611616"
+
+三、用户管理
+修改统一的签名到期提醒
+ausign -user alert_msg -v "签名到期了，请联系xxx"
+设置到期后弹窗提示后再闪退
+ausign -user expired_alert -v 1
+设置到期后直接闪退奔溃
+ausign -user expired_alert -v 0
+
+更新应用安装量和运行量报告
+ausign -user report -v 1
+
+激活软件
+ausign -user code -v "aa99adf-72e7-441"
+输入激活码激活软件,-v后面跟你得到的激活码。
+当前软件为免费试用期，无需激活，如提示激活请反馈我们处理
+
+登陆用户
+ausign -email 2462611616@qq.com -p 123456
+输入邮箱和密码将登陆软件，如果邮箱从未登陆过，则会创建账号。
+如果账号在其他电脑登陆，则当前电脑会掉线，需要重新登陆
+
+退出登陆
+ausign -logout
+
+修改用户密码
+ausign -password "123456789" -o "123456"
+把老的用户密码123456改成123456789
+
+四、时间锁管理
+
+查看应用里面的标记
+ausign -llib game.ipa
+-llib将显示所有可能为锁的标记，但不是所有的都是锁，需要根据名称和描述进行判断
+显示出来的第一列是标记的id，第二列是一些附加的可帮助判断的信息
+
+删除指定标记
+ausign -dlib game.ipa -i "@executable_path/Frameworks/libNewTimeDylib.dylib" "@executable_path/Frameworks/libNewTimeService.dylib" 
+-dlib 表示delete lib标记,-i 表示input，哪些标记要删除，这些标记可以通过签名介绍的一条命令进行查看到
+
+检验证书密码
+ausign -check dev.p12 -p 123456
+
+更多使用技巧可以加群946505735了解及时动态，那样可以常上官网http://sign.appuploader.net下载最新版本

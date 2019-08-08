@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    name: signature
+    url: jdbc:mysql://localhost:3306/signature
+    username: root
+    password:
+    type: com.mysql.cj.jdbc.MysqlDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    tomcat:
+      max-active: 20
+      initial-size: 1
+      min-idle: 1
+      max-wait: 6000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 30000
+      log-validation-errors: true
+
+  servlet:
+    multipart:
+      max-file-size: 2048MB
+      max-request-size: 2048MB
+  mvc:
+    async:
+      request-timeout: 80000
+
+mybatis:
+  configuration:
+    # 下划线转驼峰
+    map-underscore-to-camel-case: true
+
+server:
+  port: 8080
