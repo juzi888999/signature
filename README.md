@@ -36,4 +36,4 @@
 
 - 其余配置请在[Config.java](./signature/src/main/java/online/iizvv/core/config/Config.java)中修改
 
-- [使用签名的.mobileconfig文件进行无线IPhone设置](http://www.rootmanager.com/iphone-ota-configuration/iphone-ota-setup-with-signed-mobileconfig.html)
+- [使用签名的.mobileconfig文件进行无线iPhone设置](http://www.rootmanager.com/iphone-ota-configuration/iphone-ota-setup-with-signed-mobileconfig.html)
